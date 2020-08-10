@@ -1,0 +1,16 @@
+{
+  "OntRpcAddress":"http://polaris4.ont.io:20336",
+  "FactoryHash": "5933ba9ea965da1ede5153428450509f313315b0",
+  "OntdHash": "2e0de81023ea6d32460244f29c57c84ce569e7b7",
+  "Token1Hash": "9ab893c7db9a5685efb8a74fab1b078fa857ddab",
+  "Token2Hash": "",
+  "Exchange1Hash": "5bd6590b5f0954cad1728de195848164d37be0e9",
+  "Exchange2Hash": "",
+  "WalletPath": "/home/skyinglyh/Go_Workspace/src/github.com/skyinglyh1/uniswap_v1_test/wallet.dat",
+  "AcctPwd": "passwordtest",
+  "GasPrice":2500,
+  "GasLimit":200000,
+  "ContractsPath": "/home/skyinglyh/Go_Workspace/src/github.com/skyinglyh1/uniswap_v1_test/uniswap_v1_contracts/uniswap-v1/contracts/",
+  "WaitTxTimeOut": 300,
+  "OtherUsers": ["AUo22rSHAdvg4Jwuot9VfqPaGcZHhF9Wzb"]
+}

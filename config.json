@@ -1,0 +1,16 @@
+{
+  "OntRpcAddress":"http://172.168.3.76:20336",
+  "FactoryHash": "87d85ba7b76186448e9f8aa1ed43a1e0d3ced90f",
+  "OntdHash": "2e0de81023ea6d32460244f29c57c84ce569e7b7",
+  "Token1Hash": "91a2b39ff9197d3f987271577c6b3c259977d5e3",
+  "Token2Hash": "ff4db52e7ea5a765bfc5264cda87a87e56482ebc",
+  "Exchange1Hash": "abb56373e96a566ba0591ed53ff7ea714f1a5a1f",
+  "Exchange2Hash": "fe41fdfed510d8591629fd81e18ce8f20d711fea",
+  "WalletPath": "/home/skyinglyh/Go_Workspace/src/github.com/skyinglyh1/uniswap_v1_test/wallet.dat",
+  "AcctPwd": "passwordtest",
+  "GasPrice":2500,
+  "GasLimit":200000,
+  "ContractsPath": "/home/skyinglyh/Go_Workspace/src/github.com/skyinglyh1/uniswap_v1_test/uniswap_v1_contracts/uniswap-v1/contracts/",
+  "WaitTxTimeOut": 300,
+  "OtherUsers": []
+}

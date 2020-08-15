@@ -22,31 +22,34 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"github.com/ontio/ontology-crypto/keypair"
 	ontology_go_sdk "github.com/ontio/ontology-go-sdk"
 	sdkcommon "github.com/ontio/ontology-go-sdk/common"
 	"github.com/ontio/ontology/common"
+	"github.com/ontio/ontology/core/types"
 	"github.com/skyinglyh1/uniswap_v1_test/config"
+	"github.com/skyinglyh1/uniswap_v1_test/log"
 	"io/ioutil"
 	"net/http"
 	"strings"
 )
+
 type CompilePayLoad struct {
-	Type string	`json:"type"`
+	Type string `json:"type"`
 	Code string `json:"code"`
 }
 type CompileResponse struct {
 	ErrorCode uint64 `json:"errcode"`
-	Avm string `json:"avm"`
-	Abi string `json:"abi"`
-	Debug string `json:"debug"`
-	Opcode string `json:"opcode"`
-	FuncMap string `json:"funcmap"`
+	Avm       string `json:"avm"`
+	Abi       string `json:"abi"`
+	Debug     string `json:"debug"`
+	Opcode    string `json:"opcode"`
+	FuncMap   string `json:"funcmap"`
 }
 
 const CompilerUrl = "http://42.159.92.140:8089/api/v2.0/python/compile"
 
-
-func GetSdkAndAccount(url, walletPath, passwd string) (*ontology_go_sdk.OntologySdk, []*ontology_go_sdk.Account, error){
+func GetSdkAndAccount(url, walletPath, passwd string) (*ontology_go_sdk.OntologySdk, []*ontology_go_sdk.Account, error) {
 	err := config.DefConfig.Init(walletPath)
 	if err != nil {
 		fmt.Println("DefConfig.Init error:", err)
@@ -61,7 +64,7 @@ func GetSdkAndAccount(url, walletPath, passwd string) (*ontology_go_sdk.Ontology
 	}
 	accts := make([]*ontology_go_sdk.Account, 0)
 	count := wallet.GetAccountCount()
-	for i:=1; i <= count; i++ {
+	for i := 1; i <= count; i++ {
 		acct, err := wallet.GetAccountByIndex(i, []byte(passwd))
 		if err != nil {
 			return nil, nil, fmt.Errorf("wallet.GetDefaultAccount error: %v", err)
@@ -72,6 +75,34 @@ func GetSdkAndAccount(url, walletPath, passwd string) (*ontology_go_sdk.Ontology
 	return ontSdk, accts, nil
 }
 
+//sdk, accts, err := utils.GetSdkAndAccount(config.DefConfig.OntRpcAddress, config.DefConfig.WalletPath, config.DefConfig.AcctPwd)
+
+func GetSdkAndAccountNew() (*ontology_go_sdk.OntologySdk, []*ontology_go_sdk.Account, error) {
+	ontSdk := ontology_go_sdk.NewOntologySdk()
+	ontSdk.NewRpcClient().SetAddress(config.DefConfig.OntRpcAddress)
+	accts := make([]*ontology_go_sdk.Account, 0)
+	Wif := config.DefConfig.WIF
+	for i := 0; i < len(Wif); i++ {
+		acct, err := NewAccountByWif(Wif[i])
+		if err != nil {
+			return nil, nil, fmt.Errorf("wallet.GetDefaultAccount error: %v", err)
+		}
+		accts = append(accts, acct)
+	}
+	wallet, err := ontSdk.OpenWallet(config.DefConfig.WalletPath)
+	if err != nil {
+		return nil, nil, fmt.Errorf("OpenWallet error: %v", err)
+	}
+	count := wallet.GetAccountCount()
+	for i := 1; i <= count; i++ {
+		acct, err := wallet.GetAccountByIndex(i, []byte(config.DefConfig.AcctPwd))
+		if err != nil {
+			return nil, nil, fmt.Errorf("wallet.GetDefaultAccount error: %v", err)
+		}
+		accts = append(accts, acct)
+	}
+	return ontSdk, accts, nil
+}
 func CompileContract(contractFilePath string) ([]byte, error) {
 	//contractsPath := config.ContractsPath
 	//factoryFile := contractsPath + "uniswap_factory.py"
@@ -120,13 +151,12 @@ func CheckContractDeployed(sdk *ontology_go_sdk.OntologySdk, contractHash common
 }
 
 func DeployContract(sdk *ontology_go_sdk.OntologySdk, avmCode []byte, signer *ontology_go_sdk.Account) (*common.Uint256, error) {
-	txHash, err := sdk.NeoVM.DeployNeoVMSmartContract(config.DefConfig.GasPrice, config.DefConfig.GasLimit * 100000, signer, true, hex.EncodeToString(avmCode), "name", "Version", "author", "email", "desc")
+	txHash, err := sdk.NeoVM.DeployNeoVMSmartContract(config.DefConfig.GasPrice, config.DefConfig.GasLimit*100000, signer, true, hex.EncodeToString(avmCode), "name", "Version", "author", "email", "desc")
 	if err != nil {
 		return nil, fmt.Errorf("DepolyContract, error: %v", err)
 	}
 	return &txHash, nil
 }
-
 
 func CheckContracts(sdk *ontology_go_sdk.OntologySdk, factoryPath, tokenPath string, factoryHash, tokenHash common.Address, filePriorHash bool) ([]common.Address, error) {
 	newConHashes := make([]common.Address, 0)
@@ -158,8 +188,7 @@ func CheckContracts(sdk *ontology_go_sdk.OntologySdk, factoryPath, tokenPath str
 	return nil, nil
 }
 
-
-func PrintSmartEventByHash_Ont( sdk *ontology_go_sdk.OntologySdk, txHash string) []*sdkcommon.NotifyEventInfo{
+func PrintSmartEventByHash_Ont(sdk *ontology_go_sdk.OntologySdk, txHash string) []*sdkcommon.NotifyEventInfo {
 	evts, err := sdk.GetSmartContractEvent(txHash)
 	if err != nil {
 		fmt.Printf("GetSmartContractEvent error:%s", err)
@@ -175,3 +204,18 @@ func PrintSmartEventByHash_Ont( sdk *ontology_go_sdk.OntologySdk, txHash string)
 	return evts.Notify
 }
 
+func NewAccountByWif(Wif string) (*ontology_go_sdk.Account, error) {
+	// AScExXzLbkZV32tDFdV7Uoq7ZhCT1bRCGp
+	privateKey, err := keypair.WIF2Key([]byte(Wif))
+	if err != nil {
+		log.Errorf("decrypt privateKey error:%s", err)
+	}
+	pub := privateKey.Public()
+	address := types.AddressFromPubKey(pub)
+	log.Infof("address: %s\n", address.ToBase58())
+	return &ontology_go_sdk.Account{
+		PrivateKey: privateKey,
+		PublicKey:  pub,
+		Address:    address,
+	}, nil
+}

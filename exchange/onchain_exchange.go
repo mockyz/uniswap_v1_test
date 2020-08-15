@@ -10,25 +10,16 @@ import (
 	"time"
 )
 
-
 type ExchangeProviderState struct {
 	ShareBalance map[common.Address]*big.Int
 }
 
-
-
-
-
-
 type ProviderBalanceMap struct {
-	OngBalance map[common.Address]uint64
-	TokenBalance map[common.Address]*big.Int
+	OngBalance       map[common.Address]uint64
+	TokenBalance     map[common.Address]*big.Int
 	AllowanceBalance map[common.Address]*big.Int
-	ShareBalance map[common.Address]*big.Int
-
+	ShareBalance     map[common.Address]*big.Int
 }
-
-
 
 func (this *TestEnv) addLiquid(exchangeIndex int, minLiquidity, maxTokens *big.Int, ontdAmt *big.Int) error {
 	if err := this.refreshAcctBalance(); err != nil {
@@ -59,13 +50,15 @@ func (this *TestEnv) addLiquid(exchangeIndex int, minLiquidity, maxTokens *big.I
 		if this.OntdBalance[provider.Address].Cmp(ontdAmt) < 0 {
 			return fmt.Errorf("provider: %s does not have enough ontd: %v", provider.Address.ToBase58(), ontdAmt)
 		}
-
+		if err := this.refreshAcctBalance(); err != nil {
+			return fmt.Errorf("addLiquid, refreshBalance err: %v", err)
+		}
 		// addLiquidity
 		txHash, err := this.Sdk.NeoVM.InvokeNeoVMContract(this.GasPrice, this.GasLimit, provider, provider, this.OnChainEState[exchangeIndex].ExchangeAddr, []interface{}{"addLiquidity", []interface{}{
 			minLiquidity,
-				//TODO: check
-				maxTokens,
-				time.Now().Add(this.WaitTxTimeOut).Unix(), provider.Address, ontdAmt,
+			//TODO: check
+			maxTokens,
+			time.Now().Add(this.WaitTxTimeOut).Unix(), provider.Address, ontdAmt,
 		}})
 		if err != nil {
 			return fmt.Errorf("Provider: %s, addLiquid err: %v", provider.Address.ToBase58(), err)
@@ -76,14 +69,13 @@ func (this *TestEnv) addLiquid(exchangeIndex int, minLiquidity, maxTokens *big.I
 		utils.PrintSmartEventByHash_Ont(this.Sdk, txHash.ToHexString())
 	}
 
-
 	if err := this.refreshAcctBalance(); err != nil {
 		return fmt.Errorf("addLiquid, refreshBalance err: %v", err)
 	}
 	exOngBalance2 := this.OnChainEState[exchangeIndex].OntdLiquid
 	exTokenBalance2 := this.OnChainEState[exchangeIndex].TokenLiquid
 
-	if big.NewInt(0).Sub( exOngBalance2, exOntdBalance1).Cmp(ontdAmt) < 0{
+	if big.NewInt(0).Sub(exOngBalance2, exOntdBalance1).Cmp(ontdAmt) < 0 {
 		// TODO: if we don't count the tx fee, they will not equal
 		return fmt.Errorf("exchange ong balance increse incorrect")
 	}
@@ -94,12 +86,10 @@ func (this *TestEnv) addLiquid(exchangeIndex int, minLiquidity, maxTokens *big.I
 
 	// TODO: update off chain state
 	// TODO: Check onchain states equals offchain states
-
 	return nil
 }
 
-
-func (this *TestEnv) removeLiquid(exchangeIndex int, amount, min_ong *big.Int, withdrawer *ontology_go_sdk.Account) error {
+func (this *TestEnv) removeLiquid(exchangeIndex int, amount, min_ontd *big.Int, withdrawer *ontology_go_sdk.Account) error {
 	if err := this.refreshAcctBalance(); err != nil {
 		return fmt.Errorf("removeLiquid, refreshBalance err: %v", err)
 	}
@@ -128,8 +118,6 @@ func (this *TestEnv) removeLiquid(exchangeIndex int, amount, min_ong *big.Int, w
 	}
 	utils.PrintSmartEventByHash_Ont(this.Sdk, txHash.ToHexString())
 
-
-
 	if err := this.refreshAcctBalance(); err != nil {
 		return fmt.Errorf("removeLiquid, refreshBalance err: %v", err)
 	}
@@ -139,7 +127,7 @@ func (this *TestEnv) removeLiquid(exchangeIndex int, amount, min_ong *big.Int, w
 	//if exOngBalance2 - exOngBalance1 != min_ong {
 	//	return fmt.Errorf("exchange ong balance decrease incorrect")
 	//}
-	log.Debugf("removeLiquid, exchange ong decreased by : %d\n", exOngBalance1.Uint64() - exOngBalance2.Uint64())
+	log.Debugf("removeLiquid, exchange ong decreased by : %d\n", exOngBalance1.Uint64()-exOngBalance2.Uint64())
 	// TODO: token means share balance
 	if big.NewInt(0).Sub(shareB1, shareB2).Cmp(amount) != 0 {
 		return fmt.Errorf("removeLiquid, withdrawer share balance decrease incorrect")
@@ -147,8 +135,6 @@ func (this *TestEnv) removeLiquid(exchangeIndex int, amount, min_ong *big.Int, w
 
 	return nil
 }
-
-
 
 func (this *TestEnv) ontToTokenInput(ontdAmt, minTokens *big.Int, invoker *ontology_go_sdk.Account, recipient common.Address) error {
 	if err := this.refreshAcctBalance(); err != nil {
@@ -210,8 +196,6 @@ func (this *TestEnv) ontToTokenInput(ontdAmt, minTokens *big.Int, invoker *ontol
 	}
 	utils.PrintSmartEventByHash_Ont(this.Sdk, txHash.ToHexString())
 
-
-
 	if err := this.refreshAcctBalance(); err != nil {
 		return fmt.Errorf("ontToTokenInput, refreshBalance err: %v", err)
 	}
@@ -235,8 +219,6 @@ func (this *TestEnv) ontToTokenInput(ontdAmt, minTokens *big.Int, invoker *ontol
 
 	return nil
 }
-
-
 
 func (this *TestEnv) ontToTokenOutput(tokenBought *big.Int, maxOntd *big.Int, invoker *ontology_go_sdk.Account, recipient common.Address) error {
 	if err := this.refreshAcctBalance(); err != nil {
@@ -298,7 +280,6 @@ func (this *TestEnv) ontToTokenOutput(tokenBought *big.Int, maxOntd *big.Int, in
 	}
 	utils.PrintSmartEventByHash_Ont(this.Sdk, txHash.ToHexString())
 
-
 	if err := this.refreshAcctBalance(); err != nil {
 		return fmt.Errorf("ongToTokenOutput, refreshBalance err: %v", err)
 	}
@@ -323,8 +304,6 @@ func (this *TestEnv) ontToTokenOutput(tokenBought *big.Int, maxOntd *big.Int, in
 
 	return nil
 }
-
-
 
 func (this *TestEnv) tokenToOntInput(tokenSold *big.Int, minOng *big.Int, invoker *ontology_go_sdk.Account, recipient common.Address) error {
 	if err := this.refreshAcctBalance(); err != nil {
@@ -390,8 +369,6 @@ func (this *TestEnv) tokenToOntInput(tokenSold *big.Int, minOng *big.Int, invoke
 	}
 	utils.PrintSmartEventByHash_Ont(this.Sdk, txHash.ToHexString())
 
-
-
 	if err := this.refreshAcctBalance(); err != nil {
 		return fmt.Errorf("tokenToOngInput, refreshBalance err: %v", err)
 	}
@@ -413,8 +390,6 @@ func (this *TestEnv) tokenToOntInput(tokenSold *big.Int, minOng *big.Int, invoke
 
 	return nil
 }
-
-
 
 func (this *TestEnv) tokenToOntOutput(ongBought uint64, maxTokens *big.Int, invoker *ontology_go_sdk.Account, recipient common.Address) error {
 	if err := this.refreshAcctBalance(); err != nil {
@@ -480,8 +455,6 @@ func (this *TestEnv) tokenToOntOutput(ongBought uint64, maxTokens *big.Int, invo
 	}
 	utils.PrintSmartEventByHash_Ont(this.Sdk, txHash.ToHexString())
 
-
-
 	if err := this.refreshAcctBalance(); err != nil {
 		return fmt.Errorf("tokenToOngInput, refreshBalance err: %v", err)
 	}
@@ -502,7 +475,6 @@ func (this *TestEnv) tokenToOntOutput(ongBought uint64, maxTokens *big.Int, invo
 
 	return nil
 }
-
 
 func (this *TestEnv) tokenToTokenInput(tokenSoldIndex int, tokenSold *big.Int, minTokenBought *big.Int, minOntdBought *big.Int, invoker *ontology_go_sdk.Account, recipient, tokenAddr common.Address) error {
 	if err := this.refreshAcctBalance(); err != nil {
@@ -572,8 +544,6 @@ func (this *TestEnv) tokenToTokenInput(tokenSoldIndex int, tokenSold *big.Int, m
 	}
 	utils.PrintSmartEventByHash_Ont(this.Sdk, txHash.ToHexString())
 
-
-
 	if err := this.refreshAcctBalance(); err != nil {
 		return fmt.Errorf("tokenToOngInput, refreshBalance err: %v", err)
 	}
@@ -594,8 +564,6 @@ func (this *TestEnv) tokenToTokenInput(tokenSoldIndex int, tokenSold *big.Int, m
 	}
 	return nil
 }
-
-
 
 func (this *TestEnv) tokenToTokenOutput(tokenBoughtIndex int, tokenBought *big.Int, maxTokenSold *big.Int, maxOntdSold *big.Int, invoker *ontology_go_sdk.Account, recipient, tokenAddr common.Address) error {
 	if err := this.refreshAcctBalance(); err != nil {
@@ -665,8 +633,6 @@ func (this *TestEnv) tokenToTokenOutput(tokenBoughtIndex int, tokenBought *big.I
 	}
 	utils.PrintSmartEventByHash_Ont(this.Sdk, txHash.ToHexString())
 
-
-
 	if err := this.refreshAcctBalance(); err != nil {
 		return fmt.Errorf("tokenToTokenOutput, refreshBalance err: %v", err)
 	}
@@ -687,8 +653,6 @@ func (this *TestEnv) tokenToTokenOutput(tokenBoughtIndex int, tokenBought *big.I
 	}
 	return nil
 }
-
-
 
 func (this *TestEnv) tokenToExchangeInput(tokenSoldIndex int, tokenSold *big.Int, minTokenBought *big.Int, minOntdBought *big.Int, invoker *ontology_go_sdk.Account, recipient, exAddr common.Address) error {
 	if err := this.refreshAcctBalance(); err != nil {
@@ -758,8 +722,6 @@ func (this *TestEnv) tokenToExchangeInput(tokenSoldIndex int, tokenSold *big.Int
 	}
 	utils.PrintSmartEventByHash_Ont(this.Sdk, txHash.ToHexString())
 
-
-
 	if err := this.refreshAcctBalance(); err != nil {
 		return fmt.Errorf("tokenToExchangeInput, refreshBalance err: %v", err)
 	}
@@ -780,7 +742,6 @@ func (this *TestEnv) tokenToExchangeInput(tokenSoldIndex int, tokenSold *big.Int
 	}
 	return nil
 }
-
 
 func (this *TestEnv) tokenToExchangeOutput(tokenBoughtIndex int, tokenBought *big.Int, maxTokenSold *big.Int, maxOntdSold *big.Int, invoker *ontology_go_sdk.Account, recipient, tokenAddr common.Address) error {
 	if err := this.refreshAcctBalance(); err != nil {
@@ -850,8 +811,6 @@ func (this *TestEnv) tokenToExchangeOutput(tokenBoughtIndex int, tokenBought *bi
 	}
 	utils.PrintSmartEventByHash_Ont(this.Sdk, txHash.ToHexString())
 
-
-
 	if err := this.refreshAcctBalance(); err != nil {
 		return fmt.Errorf("tokenToTokenOutput, refreshBalance err: %v", err)
 	}
@@ -859,7 +818,7 @@ func (this *TestEnv) tokenToExchangeOutput(tokenBoughtIndex int, tokenBought *bi
 	exTokenB2 := this.OnChainEState[0].TokenLiquid
 	exOngInc := big.NewInt(0).Sub(exOngBalance2, exOngBalance1)
 	exTokenInc := big.NewInt(0).Sub(exTokenB2, exTokenB1)
-	log.Debugf("exchange ong increased by : %s\n", exOngInc.String())
+	log.Debugf("exchange ontD increased by : %s\n", exOngInc.String())
 	log.Debugf("exchange token increased by : %s\n", exTokenInc.String())
 
 	if invoker.Address == recipient {
@@ -871,4 +830,20 @@ func (this *TestEnv) tokenToExchangeOutput(tokenBoughtIndex int, tokenBought *bi
 
 	}
 	return nil
+}
+
+func TransferTokenOtherAccount(TokenAddress common.Address, exchangeIndex, from, to int) {
+	txHash, err := testEnv.Sdk.NeoVM.InvokeNeoVMContract(testEnv.GasPrice, testEnv.GasLimit, testEnv.OnChainEState[exchangeIndex].Providers[from], testEnv.OnChainEState[exchangeIndex].Providers[from], TokenAddress, []interface{}{"transfer", []interface{}{
+		testEnv.OnChainEState[0].Providers[from].Address,
+		testEnv.OnChainEState[0].Providers[to].Address,
+		1000000000000,
+	}})
+	if err != nil {
+		fmt.Errorf("tokenToTokenOutput, invoker: %s invoke err: %v", testEnv.OnChainEState[exchangeIndex].Providers[from].Address.ToBase58(), err)
+	}
+	if _, err := testEnv.Sdk.WaitForGenerateBlock(testEnv.WaitTxTimeOut, 1); err != nil {
+		fmt.Errorf("Ontology, not generate block after %+v, err: %v", testEnv.WaitTxTimeOut, err)
+	}
+	utils.PrintSmartEventByHash_Ont(testEnv.Sdk, txHash.ToHexString())
+
 }

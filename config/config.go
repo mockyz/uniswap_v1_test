@@ -17,21 +17,22 @@ var DefConfig = NewConfig()
 
 //Config object used by ontology-instance
 type Config struct {
-	OntRpcAddress        string
-	FactoryHash               string
-	OntdHash string
-	Token1Hash               string
-	Token2Hash            string
-	Exchange1Hash            string
-	Exchange2Hash                    string
-	WalletPath              string
-	AcctPwd string
-	GasPrice                  uint64
-	GasLimit                  uint64
+	OntRpcAddress string
+	FactoryHash   string
+	OntdHash      string
+	Token1Hash    string
+	Token2Hash    string
+	Exchange1Hash string
+	Exchange2Hash string
+	WalletPath    string
+	AcctPwd       string
+	GasPrice      uint64
+	GasLimit      uint64
 	ContractsPath string
-	TestFlag uint64	// 0 means token1 to exchange1, 1 means token1 to token2
+	TestFlag      uint64 // 0 means token1 to exchange1, 1 means token1 to token2
 	WaitTxTimeOut uint64
-	OtherUsers []string
+	OtherUsers    []string
+	WIF           []string
 }
 
 //NewConfig retuen a TestConfig instance

@@ -32,36 +32,34 @@ import (
 var testEnv *TestEnv
 
 type OnChainFactoryState struct {
-	FactoryAddr common.Address
+	FactoryAddr             common.Address
 	ExchangeHashToTokenAddr map[string]common.Address
 	TokenHahsToExchangeAddr map[string]common.Address
-	IdToTokenAddr map[uint64]common.Address
+	IdToTokenAddr           map[uint64]common.Address
 }
 
 type OnChainExchangeState struct {
 	ExchangeAddr common.Address
-	TokenAddr common.Address
-	FactoryAddr common.Address
-	Providers []*ontology_go_sdk.Account
-	OntdLiquid *big.Int
-	TokenLiquid *big.Int
+	TokenAddr    common.Address
+	FactoryAddr  common.Address
+	Providers    []*ontology_go_sdk.Account
+	OntdLiquid   *big.Int
+	TokenLiquid  *big.Int
 	ShareBalance map[common.Address]*big.Int
-	ShareSupply *big.Int
+	ShareSupply  *big.Int
 }
 
 type OnChainTokenState struct {
-	TokenAddr common.Address
-	Balances map[common.Address]*big.Int
+	TokenAddr  common.Address
+	Balances   map[common.Address]*big.Int
 	Allowances map[common.Address]*big.Int
-	Supply *big.Int
+	Supply     *big.Int
 }
 
-
-
 type TestEnv struct {
-	Sdk *ontology_go_sdk.OntologySdk
-	OntdAddr common.Address
-	Users []*ontology_go_sdk.Account
+	Sdk        *ontology_go_sdk.OntologySdk
+	OntdAddr   common.Address
+	Users      []*ontology_go_sdk.Account
 	OtherUsers []common.Address
 
 	OnChainFState *OnChainFactoryState
@@ -72,23 +70,21 @@ type TestEnv struct {
 	OffChainTState []*OnChainTokenState
 	OffChainEState []*OnChainExchangeState
 
-
-	OntdBalance map[common.Address]*big.Int
+	OntdBalance   map[common.Address]*big.Int
 	OntdAllowance map[common.Address]map[common.Address]*big.Int
 
-	GasPrice uint64
-	GasLimit uint64
+	GasPrice      uint64
+	GasLimit      uint64
 	WaitTxTimeOut time.Duration
-
 }
 
-func init(){
+func init() {
 	log.InitLog(1, log.Stdout)
 	if err := config.DefConfig.Init("../config.json"); err != nil {
 		log.Errorf("DefConfig.Init error:", err)
 		return
 	}
-	sdk, accts, err := utils.GetSdkAndAccount(config.DefConfig.OntRpcAddress, config.DefConfig.WalletPath, config.DefConfig.AcctPwd)
+	sdk, accts, err := utils.GetSdkAndAccountNew()
 	if err != nil {
 		fmt.Printf("GetSdkAndAccount error: %v", err)
 		return
@@ -121,8 +117,8 @@ func init(){
 		IdToTokenAddr:           make(map[uint64]common.Address),
 	}
 	ots1 := &OnChainTokenState{
-		TokenAddr: token1Hash,
-		Balances: make(map[common.Address]*big.Int),
+		TokenAddr:  token1Hash,
+		Balances:   make(map[common.Address]*big.Int),
 		Allowances: make(map[common.Address]*big.Int),
 	}
 
@@ -143,8 +139,8 @@ func init(){
 		}
 
 		ots2 := &OnChainTokenState{
-			TokenAddr: token2Hash,
-			Balances: make(map[common.Address]*big.Int),
+			TokenAddr:  token2Hash,
+			Balances:   make(map[common.Address]*big.Int),
 			Allowances: make(map[common.Address]*big.Int),
 		}
 
@@ -153,40 +149,39 @@ func init(){
 			ShareBalance: make(map[common.Address]*big.Int),
 		}
 		testEnv = &TestEnv{
-			Sdk: sdk,
-			Users: accts,
-			OnChainFState: ofs,
-			OnChainTState: []*OnChainTokenState{ots1, ots2},
-			OnChainEState: []*OnChainExchangeState{oes1, oes2},
+			Sdk:            sdk,
+			Users:          accts,
+			OnChainFState:  ofs,
+			OnChainTState:  []*OnChainTokenState{ots1, ots2},
+			OnChainEState:  []*OnChainExchangeState{oes1, oes2},
 			OffChainFState: ofs,
 			OffChainTState: []*OnChainTokenState{ots1, ots2},
 			OffChainEState: []*OnChainExchangeState{oes1, oes2},
-			GasPrice: config.DefConfig.GasPrice,
-			GasLimit: config.DefConfig.GasLimit,
-			WaitTxTimeOut: time.Duration(config.DefConfig.WaitTxTimeOut) * time.Second,
-			OntdBalance: make(map[common.Address]*big.Int),
+			GasPrice:       config.DefConfig.GasPrice,
+			GasLimit:       config.DefConfig.GasLimit,
+			WaitTxTimeOut:  time.Duration(config.DefConfig.WaitTxTimeOut) * time.Second,
+			OntdBalance:    make(map[common.Address]*big.Int),
 		}
 	} else {
 
 		testEnv = &TestEnv{
-			Sdk: sdk,
-			Users: accts,
-			OnChainFState: ofs,
-			OnChainTState: []*OnChainTokenState{ots1},
-			OnChainEState: []*OnChainExchangeState{oes1},
+			Sdk:            sdk,
+			Users:          accts,
+			OnChainFState:  ofs,
+			OnChainTState:  []*OnChainTokenState{ots1},
+			OnChainEState:  []*OnChainExchangeState{oes1},
 			OffChainFState: ofs,
 			OffChainTState: []*OnChainTokenState{ots1},
 			OffChainEState: []*OnChainExchangeState{oes1},
-			GasPrice: config.DefConfig.GasPrice,
-			GasLimit: config.DefConfig.GasLimit,
-			WaitTxTimeOut: time.Duration(config.DefConfig.WaitTxTimeOut) * time.Second,
-			OntdBalance: make(map[common.Address]*big.Int),
+			GasPrice:       config.DefConfig.GasPrice,
+			GasLimit:       config.DefConfig.GasLimit,
+			WaitTxTimeOut:  time.Duration(config.DefConfig.WaitTxTimeOut) * time.Second,
+			OntdBalance:    make(map[common.Address]*big.Int),
 		}
 	}
 
 	testEnv.OntdAddr = ontdHash
 	testEnv.OntdAllowance = make(map[common.Address]map[common.Address]*big.Int)
-
 
 	for _, otherUser := range config.DefConfig.OtherUsers {
 		userAddr, _ := common.AddressFromBase58(otherUser)
@@ -203,7 +198,6 @@ func init(){
 	}
 }
 
-
 func (this *TestEnv) refreshFstate() error {
 	for i := 0; i < len(this.OnChainTState); i++ {
 		tokenHash := common.ToArrayReverse(this.OnChainTState[i].TokenAddr[:])
@@ -212,7 +206,7 @@ func (this *TestEnv) refreshFstate() error {
 			return fmt.Errorf("refreshFstate, getExchange err: %v", err)
 		}
 		exchange, err := common.AddressParseFromBytes(res)
-		if err != nil{
+		if err != nil {
 			return fmt.Errorf("refreshFstate, getExchange err: %v", err)
 		}
 		if exchange != this.OnChainEState[i].ExchangeAddr {
@@ -220,14 +214,13 @@ func (this *TestEnv) refreshFstate() error {
 		}
 		this.OnChainFState.TokenHahsToExchangeAddr[hex.EncodeToString(tokenHash)] = exchange
 
-
 		exchangeHash := common.ToArrayReverse(this.OnChainEState[i].ExchangeAddr[:])
 		res1, err := GetMethod(this.Sdk, this.OnChainFState.FactoryAddr, "getToken", []interface{}{exchangeHash})
 		if err != nil {
 			return fmt.Errorf("refreshFstate, getToken err: %v", err)
 		}
 		tokenAddr, err := common.AddressParseFromBytes(res1)
-		if err != nil{
+		if err != nil {
 			return fmt.Errorf("refreshFstate, getToken err: %v", err)
 		}
 		if tokenAddr != this.OnChainTState[i].TokenAddr {
@@ -239,7 +232,6 @@ func (this *TestEnv) refreshFstate() error {
 
 	return nil
 }
-
 
 //
 //func (this *TestEnv) AddOnChainExchangeState() error {
@@ -329,8 +321,6 @@ func (this *TestEnv) refreshFstate() error {
 //
 //}
 
-
-
 func (this *TestEnv) refreshAcctBalance() error {
 	userAddrs := make([]common.Address, 0)
 	for _, user := range this.Users {
@@ -339,11 +329,11 @@ func (this *TestEnv) refreshAcctBalance() error {
 	for _, otherUser := range this.OtherUsers {
 		userAddrs = append(userAddrs, otherUser)
 	}
-
-	providers := []*ontology_go_sdk.Account{this.Users[0]}
+	//TODO: providers count control
+	providers := this.Users
 
 	exAddrs := make([]common.Address, 0)
-	for _, exchange := range this.OnChainEState{
+	for _, exchange := range this.OnChainEState {
 		exAddrs = append(exAddrs, exchange.ExchangeAddr)
 	}
 
@@ -398,7 +388,7 @@ func (this *TestEnv) refreshAcctBalance() error {
 		this.OnChainEState[i].OntdLiquid = balances[this.OntdAddr]
 
 		// udpate token addr, factory addr
-		ta , err  := GetMethod(this.Sdk, this.OnChainEState[i].ExchangeAddr, "tokenAddress", nil)
+		ta, err := GetMethod(this.Sdk, this.OnChainEState[i].ExchangeAddr, "tokenAddress", nil)
 		if err != nil {
 			return fmt.Errorf("refershAcctBal, GetMethod, err: %v", err)
 		}
@@ -407,7 +397,7 @@ func (this *TestEnv) refreshAcctBalance() error {
 			return fmt.Errorf("refershAcctBal, AddressParseFromBytes, err: %v", err)
 		}
 
-		fa , err  := GetMethod(this.Sdk, this.OnChainEState[i].ExchangeAddr, "factoryAddress", nil)
+		fa, err := GetMethod(this.Sdk, this.OnChainEState[i].ExchangeAddr, "factoryAddress", nil)
 		if err != nil {
 			return fmt.Errorf("refershAcctBal, GetMethod, err: %v", err)
 		}
@@ -436,7 +426,6 @@ func (this *TestEnv) refreshAcctBalance() error {
 
 	}
 
-
 	return nil
 }
 func GetAllowances(sdk *ontology_go_sdk.OntologySdk, tokenAddr, owner common.Address, spenders []common.Address) (map[common.Address]*big.Int, error) {
@@ -444,18 +433,18 @@ func GetAllowances(sdk *ontology_go_sdk.OntologySdk, tokenAddr, owner common.Add
 	for _, spender := range spenders {
 		allowance := new(big.Int)
 		if tokenAddr == ontology_go_sdk.ONG_CONTRACT_ADDRESS {
-			ongBalance, err := sdk.Native.Ong.Allowance(owner, spender)
+			ontdBalance, err := sdk.Native.Ong.Allowance(owner, spender)
 			if err != nil {
 				return nil, fmt.Errorf("Get ong allowance of %s error: %v", owner.ToBase58(), err)
 			}
-			allowance = big.NewInt(0).SetUint64(ongBalance)
+			allowance = big.NewInt(0).SetUint64(ontdBalance)
 		} else if tokenAddr == ontology_go_sdk.ONT_CONTRACT_ADDRESS {
 			if tokenAddr == ontology_go_sdk.ONG_CONTRACT_ADDRESS {
-				ongBalance, err := sdk.Native.Ont.Allowance(owner, spender)
+				ontdBalance, err := sdk.Native.Ont.Allowance(owner, spender)
 				if err != nil {
 					return nil, fmt.Errorf("Get ong allowance of %s error: %v", owner.ToBase58(), err)
 				}
-				allowance = big.NewInt(0).SetUint64(ongBalance)
+				allowance = big.NewInt(0).SetUint64(ontdBalance)
 			}
 		} else {
 			tokenBalanceRes, err := sdk.NeoVM.PreExecInvokeNeoVMContract(tokenAddr, []interface{}{"allowance", []interface{}{owner, spender}})
@@ -477,18 +466,18 @@ func GetBalances(sdk *ontology_go_sdk.OntologySdk, owner common.Address, tokens 
 	for _, tokenAddr := range tokens {
 		balance := new(big.Int)
 		if tokenAddr == ontology_go_sdk.ONG_CONTRACT_ADDRESS {
-			ongBalance, err := sdk.Native.Ong.BalanceOf(owner)
+			ontdBalance, err := sdk.Native.Ong.BalanceOf(owner)
 			if err != nil {
 				return nil, fmt.Errorf("Get ong balance of %s error: %v", owner.ToBase58(), err)
 			}
-			balance = big.NewInt(0).SetUint64(ongBalance)
+			balance = big.NewInt(0).SetUint64(ontdBalance)
 		} else if tokenAddr == ontology_go_sdk.ONT_CONTRACT_ADDRESS {
 			if tokenAddr == ontology_go_sdk.ONG_CONTRACT_ADDRESS {
-				ongBalance, err := sdk.Native.Ont.BalanceOf(owner)
+				ontdBalance, err := sdk.Native.Ont.BalanceOf(owner)
 				if err != nil {
 					return nil, fmt.Errorf("Get ong balance of %s error: %v", owner.ToBase58(), err)
 				}
-				balance = big.NewInt(0).SetUint64(ongBalance)
+				balance = big.NewInt(0).SetUint64(ontdBalance)
 			}
 		} else {
 			tokenBalanceRes, err := sdk.NeoVM.PreExecInvokeNeoVMContract(tokenAddr, []interface{}{"balanceOf", []interface{}{owner}})

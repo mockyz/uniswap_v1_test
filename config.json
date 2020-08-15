@@ -1,16 +1,22 @@
 {
-  "OntRpcAddress":"http://172.168.3.76:20336",
-  "FactoryHash": "87d85ba7b76186448e9f8aa1ed43a1e0d3ced90f",
-  "OntdHash": "2e0de81023ea6d32460244f29c57c84ce569e7b7",
-  "Token1Hash": "91a2b39ff9197d3f987271577c6b3c259977d5e3",
-  "Token2Hash": "ff4db52e7ea5a765bfc5264cda87a87e56482ebc",
-  "Exchange1Hash": "abb56373e96a566ba0591ed53ff7ea714f1a5a1f",
-  "Exchange2Hash": "fe41fdfed510d8591629fd81e18ce8f20d711fea",
-  "WalletPath": "/home/skyinglyh/Go_Workspace/src/github.com/skyinglyh1/uniswap_v1_test/wallet.dat",
-  "AcctPwd": "passwordtest",
+  "OntRpcAddress":"http://172.168.3.151:20336",
+  "FactoryHash": "b4189577c0c448e8455bcfc0b33c9840f3358647",
+  "OntdHash":    "2a92671b17eb6f0215dfe113b34efa6af4141f25",
+  "Token1Hash":  "202c15da9a87fda51efeee204b59152542fd9e64",
+  "Token2Hash":  "dd2bc493bb1607243d962c8435ed6ec8cb0753c1",
+  "Exchange1Hash": "700f1bb9941592185229e5bf4ff0fae8f9f7bb64",
+  "Exchange2Hash": "61df97e7305defcb523d26265f737b6011bcc6e2",
+  "WalletPath": "../wallet.dat",
+  "AcctPwd": "123456",
   "GasPrice":2500,
   "GasLimit":200000,
-  "ContractsPath": "/home/skyinglyh/Go_Workspace/src/github.com/skyinglyh1/uniswap_v1_test/uniswap_v1_contracts/uniswap-v1/contracts/",
+  "ContractsPath": "./uniswap_v1_contracts/uniswap-v1/contracts/",
   "WaitTxTimeOut": 300,
-  "OtherUsers": []
+  "OtherUsers": [],
+  "Wif": [
+  "L39Qzxvs11p9qwNhGKnatA875YqWC3zWhiGMFpFUpHScq9GkZti5",
+  "L1jBP4xhkty8s1fhfcBvvVoLnfQ1iV7VJG2bkwWHrLXB7fHM5mfx",
+  "Kx3bX4WVdW9PoGyvjYyE5Yz9EbxG8FmsmmH1KsQZT5a1iexb1Jq9",
+  "L4KdtUct2rmM6bf4dV4WWj9JQ4czHr95u4RGP8HZuZ1X6osKW1Mn"
+]
 }

@@ -93,3 +93,13 @@ func getShare(exhcangeIndex int, accountIndex int) *big.Int {
 	amount, _ := shareBalanceRes.Result.ToInteger()
 	return amount
 }
+
+func TestTransferShare(t *testing.T) {
+	// all account get init token from account[4]
+	for i := 0; i < len(testEnv.OnChainEState[0].Providers); i++ {
+		TransferTokenOtherAccount(testEnv.OnChainEState[0].TokenAddr, 0, 4, i)
+		TransferTokenOtherAccount(testEnv.OnChainEState[1].TokenAddr, 1, 4, i)
+		//providerAddr := testEnv.OnChainEState[0].Providers[i].Address
+		//log.Infof("account: %s, ontDBalance: %+v, tokenBalance: %+v, exchange 1 shareBalance: %+v\n", providerAddr.ToBase58(), testEnv.OntdBalance[providerAddr], testEnv.OnChainTState[0].Balances[providerAddr], testEnv.OnChainEState[0].ShareBalance[providerAddr])
+	}
+}

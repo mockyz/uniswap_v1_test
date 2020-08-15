@@ -33,9 +33,9 @@ type OffChainExchangeState struct {
 }
 
 func (this *OnChainExchangeState) getInputPrice(inputAmt *big.Int, inputReserve *big.Int, outputReserve *big.Int) *big.Int {
-	//if (inputReserve.Cmp(big.NewInt(0)) < 1 && outputReserve.Cmp(big.NewInt(0)) < 1) {
-	//	panic("_getInputPrice, assert error")
-	//}
+	if inputReserve.Cmp(big.NewInt(0)) < 1 && outputReserve.Cmp(big.NewInt(0)) < 1 {
+		panic("_getInputPrice, assert error")
+	}
 	inputAmtWithFee := big.NewInt(0).Mul(inputAmt, big.NewInt(9975))
 	numerator := big.NewInt(0).Mul(inputAmtWithFee, outputReserve)
 	denominator := big.NewInt(0).Add(big.NewInt(0).Mul(inputReserve, big.NewInt(10000)), inputAmtWithFee)
@@ -50,29 +50,29 @@ func (this *OnChainExchangeState) getOutputPrice(outputAmt *big.Int, inputReserv
 
 func (this *OnChainExchangeState) offOntToTokenInput(ontdSold *big.Int, minTokens *big.Int) error {
 	tokenBought := this.getInputPrice(ontdSold, this.OntdLiquid, this.TokenLiquid)
-	//TODO: exchange token balance increase ongBought
-	//TODO: exchange ong decrease ongBought
+	//TODO: exchange token balance increase ontdBought
+	//TODO: exchange ong decrease ontdBought
 	log.Debugf("offOntToTokenInput, ontToTokenInput, tokenBought is %+v, minTokens is %+v", tokenBought.String(), minTokens.String())
 	return nil
 }
 func (this *OnChainExchangeState) offOntToTokenOutput(tokensBought *big.Int, maxOntd *big.Int) error {
 	ontdSold := this.getOutputPrice(tokensBought, this.OntdLiquid, this.TokenLiquid)
-	//TODO: exchange token balance increase ongBought
-	//TODO: exchange ong decrease ongBought
+	//TODO: exchange token balance increase ontdBought
+	//TODO: exchange ong decrease ontdBought
 	log.Debugf("offOntToTokenOutput, OntToTokenOutput, ontdSold is %+v, maxOntd is %+v", ontdSold.String(), maxOntd.String())
 	return nil
 }
 func (this *OnChainExchangeState) offTokenToOntInput(tokenSold *big.Int, minOng *big.Int) error {
-	ongBought := this.getInputPrice(tokenSold, this.TokenLiquid, this.OntdLiquid)
-	//TODO: exchange token balance increase ongBought
-	//TODO: exchange ong decrease ongBought
-	log.Debugf("offTokenToOntInput, ongBought is %+v, minOng is %+v", ongBought.String(), minOng.String())
+	ontdBought := this.getInputPrice(tokenSold, this.TokenLiquid, this.OntdLiquid)
+	//TODO: exchange token balance increase ontdBought
+	//TODO: exchange ong decrease ontdBought
+	log.Debugf("offTokenToOntInput, ontdBought is %+v, minOng is %+v", ontdBought.String(), minOng.String())
 	return nil
 }
 func (this *OnChainExchangeState) offTokenToOntOutput(ongBought *big.Int, maxTokens *big.Int) error {
 	tokenSold := this.getOutputPrice(ongBought, this.TokenLiquid, this.OntdLiquid)
-	//TODO: exchange token balance increase ongBought
-	//TODO: exchange ong decrease ongBought
+	//TODO: exchange token balance increase ontdBought
+	//TODO: exchange ong decrease ontdBought
 	log.Debugf("offTokenToOntOutput, tokenSold is %+v, maxToken is %+v", tokenSold.String(), maxTokens.String())
 	return nil
 }
@@ -88,8 +88,8 @@ func (this *TestEnv) offTokenToTokenInput(tokenSold *big.Int) (*big.Int, *big.In
 
 func (this *TestEnv) offTokenToTokenOutput(tokenBought *big.Int) (*big.Int, *big.Int) {
 	ontdBought := this.OnChainEState[0].getOutputPrice(tokenBought, this.OnChainEState[0].TokenLiquid, this.OnChainEState[0].OntdLiquid)
-	//TODO: exchange token balance increase ongBought
-	//TODO: exchange ong decrease ongBought
+	//TODO: exchange token balance increase ontdBought
+	//TODO: exchange ong decrease ontdBought
 	tokenBought1 := this.OnChainEState[1].getInputPrice(ontdBought, this.OnChainEState[1].OntdLiquid, this.OnChainEState[1].TokenLiquid)
 	log.Debugf("offTokenToTokenInput, tokenSold is %+v, minOntdBought is %+v,  minTokenBought is is %+v", tokenBought.String(), ontdBought, tokenBought.String())
 	return ontdBought, tokenBought1
